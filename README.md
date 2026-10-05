@@ -59,3 +59,24 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 ```
+
+## 🔬 Dataset & Preprocessing Pipeline
+
+### 1. Indian Facial Emotion Dataset
+The dataset comprises facial expressions specifically captured from Indian demographics, addressing common demographic representation biases in computer vision. It contains 6 primary emotion categories:
+- **Angry**
+- **Disgust**
+- **Fear**
+- **Happy**
+- **Neutral**
+- **Sad**
+
+### 2. Automated Face Detection & Alignment
+To prevent background clutter and irrelevant body features from degrading feature learning:
+- **OpenCV DNN Face Detector** (ResNet-10 SSD architecture) is utilized to localize faces with high confidence ($conf > 0.6$).
+- Detected face regions are cropped with a calibrated margin and rescaled to uniform $48 \times 48$ grayscale images.
+- Uncropped or corrupted images are filtered out automatically.
+
+### 3. Deduplication & Stratified Splitting
+- **MD5 Hash Deduplication**: Exact duplicate images across different folders are detected and purged to eliminate train-test leakage.
+- **Split Ratio**: The sanitized dataset is split into **70% Training**, **15% Validation**, and **15% Test** partitions using stratified sampling to preserve original class proportions across splits.
