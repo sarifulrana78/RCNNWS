@@ -80,3 +80,12 @@ To prevent background clutter and irrelevant body features from degrading featur
 ### 3. Deduplication & Stratified Splitting
 - **MD5 Hash Deduplication**: Exact duplicate images across different folders are detected and purged to eliminate train-test leakage.
 - **Split Ratio**: The sanitized dataset is split into **70% Training**, **15% Validation**, and **15% Test** partitions using stratified sampling to preserve original class proportions across splits.
+
+### 4. Class Distribution & Offline Augmentation
+Facial emotion datasets typically suffer from severe skewness (e.g., Happy/Neutral dominate while Disgust/Fear are underrepresented).
+
+![Class Distribution](class_distribution%20%288%29.png)
+
+To solve this:
+- **Offline Data Augmentation**: Applied exclusively to the training set before training begins. Minority classes are augmented using affine transformations (rotations $\pm 15^\circ$, zoom $\pm 15\%$, horizontal shifts $\pm 10\%$) to physically equalize sample counts.
+- **Data Integrity**: Augmented samples are written only to the training split, completely safeguarding validation and test splits from leakage.
