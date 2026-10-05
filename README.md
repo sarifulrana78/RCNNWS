@@ -160,3 +160,34 @@ from keras.models import load_model
 model = load_model("emotion_model (4).keras")
 model.summary()
 ```
+
+## 📊 Quantitative Evaluation on Held-Out Test Set
+
+The model was evaluated on an independent, held-out test set containing **5,948 unseen images**.
+
+### Confusion Matrix
+![Confusion Matrix](confusion_matrix%20%288%29.png)
+
+### Classification Report:
+```text
+ Final Test Accuracy: 70.93%
+
+              precision    recall  f1-score   support
+
+       Angry       0.72      0.67      0.69      1123
+     Disgust       0.45      0.37      0.41       159
+        Fear       0.59      0.52      0.55       229
+       Happy       0.79      0.73      0.76      1608
+     Neutral       0.71      0.79      0.75      2095
+         Sad       0.60      0.64      0.62       734
+
+    accuracy                           0.71      5948
+   macro avg       0.64      0.62      0.63      5948
+weighted avg       0.71      0.71      0.71      5948
+```
+
+### Insights:
+- **Happy** achieved the highest precision ($79\%$) and F1-score ($0.76$), driven by distinct facial landmarks (smiling mouth curves).
+- **Neutral** demonstrated high recall ($79\%$) and robust precision ($71\%$), forming a strong baseline.
+- **Angry** and **Sad** achieved balanced precision/recall around $60\% - 72\%$.
+- **Disgust** and **Fear** presented the greatest challenge due to limited original natural samples, but offline augmentation successfully elevated performance beyond standard baseline FER networks.
