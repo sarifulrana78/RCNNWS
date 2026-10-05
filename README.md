@@ -109,3 +109,28 @@ The network is engineered entirely from scratch using the **Keras Functional API
 5. **Dense Classification Head**:
    - 256-unit fully connected layer regularized with He Normal kernel initialization, $L_2$ weight decay ($1.5 \times 10^{-4}$), Batch Normalization, and Dropout ($0.40$).
    - Softmax output layer providing probability distributions over the 6 emotion classes.
+
+## ⚙️ Training Strategy & Anti-Overfitting Safeguards
+
+### 1. Multi-Tier Regularization
+- **Online Augmentation**: Lightweight online perturbations (rotation $8^\circ$, zoom $8\%$, shift $6\%$, horizontal flip) ensure the network never encounters identical images across consecutive epochs.
+- **Capped Class Weights**: A dynamic balanced class weight schedule is computed as a safety net:
+  $$\text{weight}_c = \min\left(\frac{N}{K \cdot N_c}, \, 5.0 \times \min(\mathbf{w})\right)$$
+  Capping avoids excessive penalty spikes that destabilize gradient steps.
+
+### 2. Hyperparameter Configuration
+| Parameter | Value | Rationale |
+| :--- | :--- | :--- |
+| **Input Shape** | $(48, 48, 1)$ | Standardized grayscale facial input |
+| **Batch Size** | 32 | Balanced gradient stochasticity |
+| **Initial Learning Rate** | $5 \times 10^{-4}$ | Adam optimizer convergence stability |
+| **Epochs** | 100 | Sufficient depth for residual block convergence |
+| **Spatial Dropout** | 0.20 | Channel-wise feature map regularization |
+| **Dense Dropout** | 0.40 | Dense head regularization |
+| **$L_2$ Weight Decay** | $1.5 \times 10^{-4}$ | Weight penalty across all convolutional layers |
+
+### 3. Training Callbacks
+- **ModelCheckpoint**: Automatically saves `emotion_model_best.keras` based on highest validation accuracy.
+- **ReduceLROnPlateau**: Decays learning rate by factor $0.5$ when validation loss stagnates for 5 epochs (floor: $10^{-6}$).
+- **EarlyStopping**: Halts training if validation loss fails to improve for 15 consecutive epochs.
+- **CSVLogger**: Streams epoch-by-epoch loss and accuracy metrics to disk for auditing.
