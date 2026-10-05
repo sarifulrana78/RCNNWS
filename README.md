@@ -191,3 +191,60 @@ weighted avg       0.71      0.71      0.71      5948
 - **Neutral** demonstrated high recall ($79\%$) and robust precision ($71\%$), forming a strong baseline.
 - **Angry** and **Sad** achieved balanced precision/recall around $60\% - 72\%$.
 - **Disgust** and **Fear** presented the greatest challenge due to limited original natural samples, but offline augmentation successfully elevated performance beyond standard baseline FER networks.
+
+## 🔮 Real-Time Inference & Smoke Testing
+
+### Quick Inference Snippet
+To run facial emotion prediction on an arbitrary image:
+
+```python
+import cv2
+import numpy as np
+from keras.models import load_model
+
+# 1. Load trained model
+model = load_model("emotion_model (4).keras")
+class_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Neutral', 'Sad']
+
+# 2. Preprocess input image
+def predict_emotion(image_path):
+    img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    img_resized = cv2.resize(img, (48, 48))
+    img_norm = img_resized.astype("float32") / 255.0
+    img_tensor = np.expand_dims(img_norm, axis=(0, -1)) # Shape: (1, 48, 48, 1)
+
+    # 3. Predict probabilities
+    preds = model.predict(img_tensor)[0]
+    predicted_idx = np.argmax(preds)
+    return class_labels[predicted_idx], preds[predicted_idx]
+
+# Example execution
+# emotion, confidence = predict_emotion("sample_face.jpg")
+# print(f"Detected: {emotion} ({confidence*100:.1f}%)")
+```
+
+### Smoke Test Verification
+A smoke test verifies end-to-end operational viability without requiring the full dataset:
+1. Feeds synthetic random tensors $(1, 48, 48, 1)$ through the compiled model.
+2. Asserts output shape matches $(1, 6)$ and softmax probabilities sum to $1.0 \pm 10^{-5}$.
+3. Confirms GPU acceleration and model inference latency ($< 15\text{ ms}$ per frame).
+
+---
+
+## 🏆 Capstone Project Summary
+
+| Metric | Result |
+| :--- | :--- |
+| **Model Type** | Custom Deep Residual CNN (Built from scratch) |
+| **Total Test Samples** | 5,948 images |
+| **Overall Test Accuracy** | **70.93%** |
+| **Macro F1-Score** | 0.63 |
+| **Weighted F1-Score** | 0.71 |
+| **Demographic Focus** | Indian Facial Emotion Dataset |
+| **Key Novelty** | Offline Augmentation Balancing + Dual-Conv Skip Residuals |
+
+---
+
+## 👨‍💻 Author & Acknowledgements
+
+Developed by **Sariful Islam** ([@sarifulrana78](https://github.com/sarifulrana78)) as part of **Capstone C**.
