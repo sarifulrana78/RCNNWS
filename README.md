@@ -134,3 +134,14 @@ The network is engineered entirely from scratch using the **Keras Functional API
 - **ReduceLROnPlateau**: Decays learning rate by factor $0.5$ when validation loss stagnates for 5 epochs (floor: $10^{-6}$).
 - **EarlyStopping**: Halts training if validation loss fails to improve for 15 consecutive epochs.
 - **CSVLogger**: Streams epoch-by-epoch loss and accuracy metrics to disk for auditing.
+
+## 📈 Training History & Convergence Dynamics
+
+The model was trained over 100 epochs with dynamic learning rate scheduling and early stopping safeguards.
+
+![Training History](training_history%20%2811%29.png)
+
+### Key Observations:
+- **Rapid Initial Convergence**: The residual skip connections enabled rapid learning within the first 15 epochs, crossing 60% validation accuracy early.
+- **Generalization Gap**: The difference between final training accuracy and validation accuracy remained healthy (under 7%), demonstrating that the dual-stage regularization (offline + online augmentation + SpatialDropout) prevented catastrophic overfitting.
+- **Stable Loss Trajectory**: Validation loss plateaued smoothly without diverging.
