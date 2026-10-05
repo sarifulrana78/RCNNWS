@@ -89,3 +89,23 @@ Facial emotion datasets typically suffer from severe skewness (e.g., Happy/Neutr
 To solve this:
 - **Offline Data Augmentation**: Applied exclusively to the training set before training begins. Minority classes are augmented using affine transformations (rotations $\pm 15^\circ$, zoom $\pm 15\%$, horizontal shifts $\pm 10\%$) to physically equalize sample counts.
 - **Data Integrity**: Augmented samples are written only to the training split, completely safeguarding validation and test splits from leakage.
+
+## 🧠 Custom Residual CNN (Version 3) Architecture
+
+The network is engineered entirely from scratch using the **Keras Functional API** without relying on pretrained backbones or transfer learning weights.
+
+### Key Architectural Pillars:
+1. **Dual-Convolution Residual Blocks**:
+   - Each residual block employs two consecutive $3 \times 3$ Conv2D layers with Batch Normalization and ReLU activation before residual addition.
+   - The first convolution captures localized primitive features (edges/textures), while the second synthesizes compound geometric patterns before spatial downsampling.
+2. **Residual Skip Connections**:
+   - Identity shortcuts add the block input directly to the post-activation output: $\mathbf{y} = \mathcal{F}(\mathbf{x}) + \mathbf{x}$.
+   - For channel transitions (32 -> 64 -> 128 -> 256), a $1 \times 1$ convolution projection maintains dimensional alignment.
+   - Prevents vanishing gradients, allowing smooth gradient backpropagation across deep layers.
+3. **SpatialDropout2D**:
+   - Drops entire $2D$ feature maps rather than isolated pixels, forcing channels to learn mutually independent representations.
+4. **Global Average Pooling (GAP)**:
+   - Replaces traditional heavy Flatten layers ($3 \times 3 \times 256 = 2304$ units), dramatically reducing parameter count by over 800,000 parameters and mitigating dense layer overfitting.
+5. **Dense Classification Head**:
+   - 256-unit fully connected layer regularized with He Normal kernel initialization, $L_2$ weight decay ($1.5 \times 10^{-4}$), Batch Normalization, and Dropout ($0.40$).
+   - Softmax output layer providing probability distributions over the 6 emotion classes.
