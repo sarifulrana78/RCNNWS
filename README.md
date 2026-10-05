@@ -145,3 +145,18 @@ The model was trained over 100 epochs with dynamic learning rate scheduling and 
 - **Rapid Initial Convergence**: The residual skip connections enabled rapid learning within the first 15 epochs, crossing 60% validation accuracy early.
 - **Generalization Gap**: The difference between final training accuracy and validation accuracy remained healthy (under 7%), demonstrating that the dual-stage regularization (offline + online augmentation + SpatialDropout) prevented catastrophic overfitting.
 - **Stable Loss Trajectory**: Validation loss plateaued smoothly without diverging.
+
+## 💾 Model Serialization & Weights
+
+The fully trained model is saved in modern native Keras format (`.keras`):
+- **Artifact**: `emotion_model (4).keras` (15.6 MB)
+- **Framework**: Keras 3 / TensorFlow 2.x
+- **Format**: Self-contained archive including full architecture graph, compiled optimizer state, and learned weights.
+
+### Loading the Model in Python:
+```python
+from keras.models import load_model
+
+model = load_model("emotion_model (4).keras")
+model.summary()
+```
